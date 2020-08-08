@@ -9,13 +9,6 @@
     <version>1.0-SNAPSHOT</version>
 
     <dependencies>
-        <!--c3p0连接池-->
-        <dependency>
-            <groupId>com.mchange</groupId>
-            <artifactId>c3p0</artifactId>
-            <version>0.9.5.2</version>
-        </dependency>
-
         <!--数据库驱动-->
         <dependency>
             <groupId>mysql</groupId>

@@ -2,7 +2,7 @@ package com.zuikaku.pilipili.dao;
 
 import com.zuikaku.pilipili.pojo.Album;
 import com.zuikaku.pilipili.pojo.Picture;
-import com.zuikaku.pilipili.tool.C3P0DataSource;
+import com.zuikaku.pilipili.tool.JDBCUtils;
 
 import java.sql.Connection;
 import java.sql.Date;
@@ -31,7 +31,7 @@ public class PictureDAO {
      * @return
      */
     public boolean addPictureByPicture(Picture picture){
-        Connection connection= C3P0DataSource.getConnection();
+        Connection connection= JDBCUtils.connection;
         PreparedStatement preparedStatement=null;
         String insertSQL="INSERT INTO t_picture(`name`,picture_path,album_id,sort_no,create_date) VALUES (?,?,?,?,?)";
         try {
@@ -43,7 +43,6 @@ public class PictureDAO {
             preparedStatement.setDate(5,new Date(picture.getCreateDate().getTime()));
             int res = preparedStatement.executeUpdate();
             preparedStatement.close();
-            C3P0DataSource.closeConnection(connection);
             if(res>0){
                 return true;
             }else {

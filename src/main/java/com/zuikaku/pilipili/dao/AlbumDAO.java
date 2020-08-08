@@ -1,7 +1,7 @@
 package com.zuikaku.pilipili.dao;
 
 import com.zuikaku.pilipili.pojo.Album;
-import com.zuikaku.pilipili.tool.C3P0DataSource;
+import com.zuikaku.pilipili.tool.JDBCUtils;
 
 import java.sql.*;
 
@@ -28,7 +28,7 @@ public class AlbumDAO {
      * @return
      */
     public long addAlbumByAlbum(Album album) {
-        Connection connection = C3P0DataSource.getConnection();
+        Connection connection = JDBCUtils.connection;
         String insertSQL = "INSERT INTO t_album(`name`,create_date,cover_path,folder_path) VALUES(?,?,?,?)";
         PreparedStatement preparedStatement = null;
         try {
@@ -44,7 +44,6 @@ public class AlbumDAO {
             }
             rs.close();
             preparedStatement.close();
-            C3P0DataSource.closeConnection(connection);
         } catch (SQLException e) {
             e.printStackTrace();
             return -1;
@@ -59,7 +58,7 @@ public class AlbumDAO {
      * @return
      */
     public boolean updateCoverAndFolderById(Album album) {
-        Connection connection = C3P0DataSource.getConnection();
+        Connection connection = JDBCUtils.connection;
         String updateSql = "UPDATE  t_album SET cover_path = ?,folder_path = ? WHERE album_id = ?";
         PreparedStatement preparedStatement = null;
         try {
@@ -69,7 +68,6 @@ public class AlbumDAO {
             preparedStatement.setLong(3, album.getAlbumId());
             int res = preparedStatement.executeUpdate();
             preparedStatement.close();
-            C3P0DataSource.closeConnection(connection);
             if (res > 0) {
                 return true;
             } else {
@@ -80,5 +78,25 @@ public class AlbumDAO {
             return false;
         }
 
+    }
+
+    public boolean deleteAlbumByPK(long albumId) {
+        Connection connection = JDBCUtils.connection;
+        String deleteSql = "DELETE FROM t_album WHERE album_id = ?";
+        PreparedStatement preparedStatement = null;
+        try {
+            preparedStatement = connection.prepareStatement(deleteSql);
+            preparedStatement.setLong(1, albumId);
+            int res = preparedStatement.executeUpdate();
+            preparedStatement.close();
+            if (res > 0) {
+                return true;
+            } else {
+                return false;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }

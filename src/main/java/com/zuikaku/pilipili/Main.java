@@ -4,7 +4,7 @@ import com.zuikaku.pilipili.dao.AlbumDAO;
 import com.zuikaku.pilipili.dao.PictureDAO;
 import com.zuikaku.pilipili.pojo.Album;
 import com.zuikaku.pilipili.pojo.Picture;
-import com.zuikaku.pilipili.tool.C3P0DataSource;
+import com.zuikaku.pilipili.tool.JDBCUtils;
 import com.zuikaku.pilipili.tool.ZuikakuTool;
 
 import java.io.File;
@@ -21,7 +21,7 @@ public class Main {
         ResourceBundle rb=ResourceBundle.getBundle("config");
         String inputRoot =rb.getString("input.root.folder");
         String outputRoot =rb.getString("output.root.folder");
-        C3P0DataSource.init();//初始化连接池
+        JDBCUtils.init();//初始化数据库连接
         List<File> folderList = new ArrayList<File>();//原目录下的所有子目录列表
         ZuikakuTool.findAllFolderByRootFolder(new File(inputRoot),folderList );
         System.out.println("---发现本子数："+folderList.size()+"本---");
@@ -51,6 +51,13 @@ public class Main {
             album.setFolderPath("/album/"+albumId);//路径字段注入回去
             // 获取源文件夹下的图片文件，由于已经排序，直接用循环码进行复制到out对应文件，然后创建图片记录
             List<File> originPictureFileList = ZuikakuTool.findAllPictureByFolder(folder);
+            if(originPictureFileList==null||originPictureFileList.size()==0){
+                //说明为空文件夹或该文件夹下没有图片，删除创建的album记录，并结束本次循环，继续下次循环
+                boolean isOk = AlbumDAO.getInstance().deleteAlbumByPK(albumId);
+                folderCounter++;
+                continue;
+
+            }
             int pictureCounter=1;//图片名称计数器（也是排序号）
             for (File picture:originPictureFileList
                  ) {
@@ -75,7 +82,8 @@ public class Main {
                 pictureCounter++;
 
             }
-            album.setCoverPath("/album/"+albumId+"/1"+originPictureFileList.get(0));
+            String fileSuffix=originPictureFileList.get(0).getName().substring(originPictureFileList.get(0).getName().lastIndexOf("."));
+            album.setCoverPath("/album/"+albumId+"/1"+fileSuffix);
             // 最后更新album记录，更新 目录 和 封面文件 两个字段
             boolean isOk3= AlbumDAO.getInstance().updateCoverAndFolderById(album);
             if(!isOk3){
