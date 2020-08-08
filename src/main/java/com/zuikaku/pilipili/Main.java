@@ -24,7 +24,10 @@ public class Main {
         C3P0DataSource.init();//初始化连接池
         List<File> folderList = new ArrayList<File>();//原目录下的所有子目录列表
         ZuikakuTool.findAllFolderByRootFolder(new File(inputRoot),folderList );
+        System.out.println("---发现本子数："+folderList.size()+"本---");
+        int folderCounter=1;
         for (File folder :folderList){
+            System.out.println("---现在处理第"+folderCounter+"个本子："+folder.getName()+"---");
             // 获取源文件夹信息（先创建Album记录获得该记录主键ID）
             Album album=new Album();
             album.setName(folder.getName());
@@ -79,6 +82,8 @@ public class Main {
                 System.err.println("更新本子记录失败");
                 return;
             }
+            System.out.println("---处理完毕第"+folderCounter+"个本子："+folder.getName()+"---");
+            folderCounter++;
         }
     }
 }

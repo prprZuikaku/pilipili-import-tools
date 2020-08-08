@@ -77,8 +77,7 @@ public class ZuikakuTool {
                 numberFileDO.setNumberName(number);
                 numberSortFileDOList.add(numberFileDO);
             } catch (NumberFormatException e) {
-                e.printStackTrace();
-                System.out.println("该文件不是数字名称");
+
                 SortFileDO strFileDO = new SortFileDO();
                 strFileDO.setFile(temp);
                 strFileDO.setNoNumberName(fileName);
